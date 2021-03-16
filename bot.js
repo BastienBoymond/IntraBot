@@ -4,6 +4,7 @@ const axios = require("axios");
 
 const bot = new Discord.Client();
 const config = JSON.parse(fs.readFileSync("config.json").toString());
+const color = JSON.parse(fs.readFileSync("color.json").toString());
 
 bot.on("ready", () => {
     console.log("Intrabot ready to do action");
@@ -20,7 +21,27 @@ bot.on("message", async message => {
 
     //Help
     //Login
+    if (command === "login" && message.channel.type === "dm") {
+
+    }
+    if (command === "login") {
+        let embed = new Discord.MessageEmbed();
+        embed.setColor(color.Red);
+        embed.setTitle(`Error`);
+        embed.setDescription(`To use this command go in Dm`);
+        return message.channel.send(embed);
+    }
     //Logout
+    if (command === "logout" && message.channel.type === "dm") {
+
+    }
+    if (command === "logout") {
+        let embed = new Discord.MessageEmbed();
+        embed.setColor(color.Red);
+        embed.setTitle(`Error`);
+        embed.setDescription(`To use this command go in Dm`);
+        return message.channel.send(embed);
+    }
     //Profile
     //Gpa
     //xp
@@ -37,7 +58,7 @@ bot.on("message", async message => {
     //learn
 });
 
-client.on("guildMemberAdd", member => {
+bot.on("guildMemberAdd", member => {
     roles = member.guild.roles.cache.find(roles => roles.name === 'User');
     member.roles.add(roles);
     member.createDM().then(channel => {
