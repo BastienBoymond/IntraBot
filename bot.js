@@ -7,6 +7,7 @@ const bot = new Discord.Client();
 //Json parsing
 const config = JSON.parse(fs.readFileSync("config.json").toString());
 const color = JSON.parse(fs.readFileSync("color.json").toString());
+const emote = JSON.parse(fs.readFileSync("emote.json").toString());
 let data;
 try {
     data = JSON.parse(fs.readFileSync(config.data, 'utf8'));
@@ -117,7 +118,23 @@ bot.on("message", async message => {
 
     //Gpa
     else if (command === "gpa") {
-
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then(response => {
+                const gpa = response.data.gpa[0].gpa;
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Green);
+                embed.setTitle(`GPA`);
+                embed.setDescription(`Your GPA was ${gpa}`);
+                return message.channel.send(embed);
+            });
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
+        }
     }
 
     //xp
@@ -126,8 +143,24 @@ bot.on("message", async message => {
     }
 
     //Credit
-    else if (command === "credit") {
-
+    else if (command === "credits" || command === "credit") {
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then(response => {
+                const credits = response.data.credits;
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Green);
+                embed.setTitle(`Credits ${emote.credits}`);
+                embed.setDescription(`You got ${credits} credits`);
+                return message.channel.send(embed);
+            });
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
+        }
     }
 
     //flags
