@@ -177,6 +177,16 @@ bot.on("message", async message => {
                 embed.addField(flags.remarkable.label + emote.pouce, flags.remarkable.nb, true);
                 embed.addField(flags.medal.label + emote.medal, flags.medal.nb, true);
                 return message.channel.send(embed);
+            }).catch((e) => {
+                const flags = e.response.data.flags;
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Green);
+                embed.setTitle(`Flags`);
+                embed.addField(flags.ghost.label + " " + emote.absent, flags.ghost.nb, false);
+                embed.addField(flags.difficulty.label + " " + emote.dificulty, flags.difficulty.nb, false);
+                embed.addField(flags.remarkable.label + " " + emote.pouce, flags.remarkable.nb, false);
+                embed.addField(flags.medal.label + " " + emote.medal, flags.medal.nb, false);
+                return message.channel.send(embed);
             });
         } else {
             let embed = new Discord.MessageEmbed();
@@ -205,17 +215,97 @@ bot.on("message", async message => {
                 }
                 return message.channel.send(embed);
             });
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
         }
     }
 
     //grade
-    else if (command === "grade") {
-
+    else if (command === "grade" || command === "grades") {
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/${data.log[index].mail}/notes?format=json`).then(response => {
+                DATA = response.data.modules;
+                let embed = new Discord.MessageEmbed();
+                let nbmodules = DATA.length;
+                for (let k = 0; k < nbmodules; k++) {
+                    const modules = DATA[k].codemodule
+                    if (args[0] == modules) {
+                        embed.setTitle(`Grade on Module ${DATA[k].title}`)
+                        embed.setColor(color.Green);
+                        if (DATA[k].grade == '-') {
+                            embed.setDescription(`Grade Not Set`);
+                        } else {
+                            embed.setDescription(`Your Grade was ${DATA[k].grade}`)
+                        }
+                        return message.channel.send(embed);
+                    }
+                }
+                let embed2 = new Discord.MessageEmbed();
+                embed2.setColor(color.Red);
+                embed2.setTitle(`Error`);
+                embed2.setDescription(`**Put a Valid Module**\n Exemple !grade B-MUL-100`);
+                return message.channel.send(embed2);
+            });
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
+        }
     }
 
     //news
-    else if (command === 'news') {
-
+    else if (command === 'news' || command === 'notif' || command === 'notification') {
+        const index = getUserIndex(data, message.author.id);
+        if (args[0] === "alert" || args[0] === "coming" || args[0] === "missed" || args[0] === "message") {
+            if (index > -1) {
+                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/${data.log[index].mail}/notification/${args[0]}?format=json`).then(response => {
+                    DATA = response.data;
+                    let embed = new Discord.MessageEmbed();
+                    embed.setColor(color.Green);
+                    embed.setTitle(`News on ${args[0]}`);
+                    if (args[0] === "alert") {
+                        let nbalert = DATA.length;
+                        embed.setDescription(`**You got ${nbalert} alert**`);
+                        if (nbalert >= 1)
+                            embed.setColor(color.Yellow);
+                        if (nbalert >= 3)
+                            embed.setColor(color.Red);
+                        for (let k = 0; k < nbalert; k++) {
+                        embed.addField(`alert ${k + 1} :`,`${DATA[k].title}`, true);
+                        }
+                    }
+                    if (args[0] === "coming") {
+                        let nbcomming = DATA.length;
+                        if (nbcomming == undefined)
+                            nbcomming = 0;
+                        embed.setDescription(`**You got ${nbcomming} comming**`);
+                        for (let k = 0; k < nbcomming; k++) {
+                        embed.addField(`alert ${k + 1} :`,`${DATA[k].title}`, true);
+                        }
+                    }
+                    message.channel.send(embed);
+                });
+            } else {
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Red);
+                embed.setTitle(`Error`);
+                embed.setDescription(`Your not log so you cannot do this command do !login`);
+                return message.channel.send(embed);
+            }
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`**The only arg you can put was**\n !news [alert, coming, missed, message]`);
+            return message.channel.send(embed);
+        }
     }
 
     //deadline
