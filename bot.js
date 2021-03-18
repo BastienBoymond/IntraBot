@@ -165,12 +165,47 @@ bot.on("message", async message => {
 
     //flags
     else if (command === "flags") {
-
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/${data.log[index].mail}/flags?format=json`).then(response => {
+                const flags = response.data.flags;
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Green);
+                embed.setTitle(`Flags`);
+                embed.addField(flags.ghost.label + emote.absent, flags.ghost.nb, true);
+                embed.addField(flags.difficulty.label + emote.dificulty, flags.difficulty.nb, true);
+                embed.addField(flags.remarkable.label + emote.pouce, flags.remarkable.nb, true);
+                embed.addField(flags.medal.label + emote.medal, flags.medal.nb, true);
+                return message.channel.send(embed);
+            });
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
+        }
     }
 
     //binomes
-    else if (command === "binomes") {
-
+    else if (command === "binomes" || command == "binome") {
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/${data.log[index].mail}/binome?format=json`).then(response => {
+                let embed = new Discord.MessageEmbed();
+                DATA = response.data.binomes;
+                const login = response.data.user.login.split('@epitech.eu');
+                let nbstudent = DATA.length;
+                embed.setTitle(`Binomes of ${login[0]}`)
+                embed.setColor(color.Green);
+                for (let j = 0; j < nbstudent; j++) {
+                    const student = DATA[j]
+                    const logstudent = student.login.split('@epitech.eu');
+                    embed.addField(`${logstudent[0]}`, `${student.weight}`, true);
+                }
+                return message.channel.send(embed);
+            });
+        }
     }
 
     //grade
