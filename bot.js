@@ -272,6 +272,8 @@ bot.on("message", async message => {
                     embed.setTitle(`News on ${args[0]}`);
                     if (args[0] === "alert") {
                         let nbalert = DATA.length;
+                        if (nbalert == undefined)
+                            nbalert = 0;
                         embed.setDescription(`**You got ${nbalert} alert**`);
                         if (nbalert >= 1)
                             embed.setColor(color.Yellow);
@@ -287,7 +289,29 @@ bot.on("message", async message => {
                             nbcomming = 0;
                         embed.setDescription(`**You got ${nbcomming} comming**`);
                         for (let k = 0; k < nbcomming; k++) {
-                        embed.addField(`alert ${k + 1} :`,`${DATA[k].title}`, true);
+                        embed.addField(`coming ${k + 1} :`,`${DATA[k].title}`, true);
+                        }
+                    }
+                    if (args[0] === "missed") {
+                        let nbmissed = DATA.recents.length;
+                        if (nbmissed == undefined)
+                            nbmissed = 0;
+                        embed.setDescription(`**You got ${nbmissed} missed**`);
+                        if (nbmissed >= 1)
+                            embed.setColor(color.Yellow);
+                        if (nbmissed >= 3)
+                            embed.setColor(color.Red);
+                        for (let k = 0; k < nbmissed; k++) {
+                        embed.addField(`coming ${k + 1} :`,`${DATA[k].title}`, true);
+                        }
+                    }
+                    if (args[0] === "message") {
+                        let nbmessage = DATA.length;
+                        if (nbmessage == undefined)
+                            nbmessage = 0;
+                        embed.setDescription(`**You got ${nbmessage} message**`);
+                        for (let k = 0; k < nbmessage; k++) {
+                        embed.addField(`message ${k + 1} :`,`**Category:** ${DATA[k].class}\n**Content:** ${DATA[k].content}`, true);
                         }
                     }
                     message.channel.send(embed);
