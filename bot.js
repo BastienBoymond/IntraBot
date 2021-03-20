@@ -18,6 +18,9 @@ try {
     fs.writeFileSync(config.data, JSON.stringify(data));
 }
 
+let city;
+let year;
+
 function getUserIndex(Data, user)
 {
     for (i = 0; Data.log[i]; i++) {
@@ -139,7 +142,43 @@ bot.on("message", async message => {
 
     //xp
     else if (command === "xp") {
-
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then(response => {
+                all = response.data.location.split("/");
+                city = all.pop();
+                year = response.data.scolaryear;
+                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`).then(response => {
+                    activity = response.data.activites;
+                    xp = 0;
+                    let dataactivity = activity.length;
+                    for (let i = 0; i < dataactivity ; i++) {
+                        if (activity[i].type_title == "Workshop") {
+                            evnt = activity[i].events;
+                            let dataevnt = evnt.length;
+                            for (let j = 0; j < dataevnt; j++) {
+                                if (evnt[j].user_status == "present") {
+                                    console.log(evnt[j]);
+                                    xp += 2;
+                                } else if (evnt[j].user_status == "absent")
+                                    xp -= 2;
+                            }
+                        }
+                    }
+                    let embed = new Discord.MessageEmbed();
+                    embed.setColor(color.Green);
+                    embed.setTitle(`Your Xp`);
+                    embed.setDescription(`You got ${xp} xp`);
+                    return message.channel.send(embed);
+                });
+            });
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
+        }  
     }
 
     //Credit
