@@ -37,7 +37,7 @@ bot.on("ready", () => {
 });
 
 //Bot command
-bot.on("message", async message => {
+bot.on("message", message => {
     //Start of prefix
     const prefix = config.prefix;
     if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -144,31 +144,94 @@ bot.on("message", async message => {
     else if (command === "xp") {
         const index = getUserIndex(data, message.author.id);
         if (index > -1) {
-            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then(response => {
+            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
                 all = response.data.location.split("/");
                 city = all.pop();
                 year = response.data.scolaryear;
-                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`).then(response => {
+                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`).then(async response => {
                     activity = response.data.activites;
                     xp = 0;
+                    limitWorkshop = 0;
+                    limitTalk = 0;
+                    limitExp = 0;
+                    limitHack = 0;
                     let dataactivity = activity.length;
                     for (let i = 0; i < dataactivity ; i++) {
                         if (activity[i].type_title == "Workshop") {
                             evnt = activity[i].events;
                             let dataevnt = evnt.length;
-                            for (let j = 0; j < dataevnt; j++) {
+                            for (let j = 0; j < dataevnt && limitWorkshop != 10; j++) {
                                 if (evnt[j].user_status == "present") {
-                                    console.log(evnt[j]);
+                                    limitWorkshop += 1;
                                     xp += 2;
-                                } else if (evnt[j].user_status == "absent")
+                                } else if (evnt[j].user_status == "absent") {
+                                    limitWorkshop -= 1;
                                     xp -= 2;
+                                }
                             }
+                        } else if (activity[i].type_title == "Talk") {
+                            evnt = activity[i].events;
+                            let dataevnt = evnt.length;
+                            for (let j = 0; j < dataevnt && limitTalk != 15; j++) {
+                                if (evnt[j].user_status == "present") {
+                                    limitTalk += 1;
+                                    xp += 1;
+                                } else if (evnt[j].user_status == "absent") {
+                                    limitTalk -= 1;
+                                    xp -= 1;
+                                }
+                            }
+                        } else if (activity[i].type_title == "Experience") {
+                            if (limitExp < 8) {
+                                acti = activity[i].codeacti;
+                                await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/project/?format=json`).then(response => {
+                                    if (response.data.user_project_status == "project_confirmed") {
+                                        limitExp += 1;
+                                        xp += 3;
+                                    }
+                                });
+                            }
+                        } else if (activity[i].type_title == "Hackathon") {
+                            acti = activity[i].codeacti;
+                            await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`).then(response => {
+                                evnt = response.data.events;
+                                let dataevnt = evnt.length;
+                                for (let j = 0; j < dataevnt; j++) {
+                                    if (evnt[j].user_status == "present") {
+                                        xp += 6;
+                                        limitHack += 1;
+                                    } else if (evnt[j].user_status == "absent") {
+                                        xp -= 6;
+                                        limitHack += 1;
+                                    }
+                                }
+                            });
                         }
                     }
+                    let Talk;
+                    let Workshop;
+                    let Experience;
+                    let Hack;
+                    if (limitTalk == 15) {
+                        Talk = "You go 15 xp It's your limit";
+                    }  else {
+                        Talk = `You got ${limitTalk} xp. You can do ${15 -limitTalk} Talk to be at your limit`
+                    }
+                    if (limitWorkshop == 10) {
+                        Workshop = "You go 20 xp It's your limit";
+                    }  else {
+                        Workshop = `You got ${limitWorkshop * 2} xp. You can do ${10 - limitWorkshop} Workshop to be at your limit`
+                    }
+                    if (limitExp == 10) {
+                        Experience = "You go 20 xp It's your limit";
+                    }  else {
+                        Experience = `You got ${limitExp * 3} xp. You can do ${8 - limitExp} Experience to be at your limit`
+                    }
+                    Hack = `You got ${limitHack * 6} xp, You don't have limit on Hackatlon have fun`
                     let embed = new Discord.MessageEmbed();
                     embed.setColor(color.Green);
                     embed.setTitle(`Your Xp`);
-                    embed.setDescription(`You got ${xp} xp`);
+                    embed.setDescription(`You got ${xp} xp\n**Détails**\n**Talk**: ${Talk}\n**Workshop**: ${Workshop}\n**Experience**: ${Experience}\n**Hackatlon**${Hack}`);
                     return message.channel.send(embed);
                 });
             });
