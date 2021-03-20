@@ -18,9 +18,6 @@ try {
     fs.writeFileSync(config.data, JSON.stringify(data));
 }
 
-let city;
-let year;
-
 function getUserIndex(Data, user)
 {
     for (i = 0; Data.log[i]; i++) {
@@ -37,7 +34,7 @@ bot.on("ready", () => {
 });
 
 //Bot command
-bot.on("message", message => {
+bot.on("message", async message => {
     //Start of prefix
     const prefix = config.prefix;
     if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -144,17 +141,23 @@ bot.on("message", message => {
     else if (command === "xp") {
         const index = getUserIndex(data, message.author.id);
         if (index > -1) {
+            let embed2 = new Discord.MessageEmbed();
+            embed2.setColor(color.Yellow);
+            embed2.setTitle(`Wait`);
+            embed2.setDescription(`Calculating...`);
+            let msg = await message.channel.send(embed2)
             axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
-                all = response.data.location.split("/");
-                city = all.pop();
-                year = response.data.scolaryear;
+                let all = response.data.location.split("/");
+                let city = all.pop();
+                let year = response.data.scolaryear;
                 axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`).then(async response => {
-                    activity = response.data.activites;
-                    xp = 0;
-                    limitWorkshop = 0;
-                    limitTalk = 0;
-                    limitExp = 0;
-                    limitHack = 0;
+                    let activity = response.data.activites;
+                    let xp = 0;
+                    let projethub = 0;
+                    let limitWorkshop = 0;
+                    let limitTalk = 0;
+                    let limitExp = 0;
+                    let limitHack = 0;
                     let dataactivity = activity.length;
                     for (let i = 0; i < dataactivity ; i++) {
                         if (activity[i].type_title == "Workshop") {
@@ -184,34 +187,40 @@ bot.on("message", message => {
                         } else if (activity[i].type_title == "Experience") {
                             if (limitExp < 8) {
                                 acti = activity[i].codeacti;
-                                await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/project/?format=json`).then(response => {
-                                    if (response.data.user_project_status == "project_confirmed") {
-                                        limitExp += 1;
-                                        xp += 3;
-                                    }
-                                });
+                                const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/project/?format=json`);
+                                if (response.data.user_project_status == "project_confirmed") {
+                                    limitExp += 1;
+                                    xp += 3;
+                                }
                             }
                         } else if (activity[i].type_title == "Hackathon") {
                             acti = activity[i].codeacti;
-                            await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`).then(response => {
-                                evnt = response.data.events;
-                                let dataevnt = evnt.length;
-                                for (let j = 0; j < dataevnt; j++) {
-                                    if (evnt[j].user_status == "present") {
-                                        xp += 6;
-                                        limitHack += 1;
-                                    } else if (evnt[j].user_status == "absent") {
-                                        xp -= 6;
-                                        limitHack += 1;
-                                    }
+                            const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
+                            evnt = response.data.events;
+                            let dataevnt = evnt.length;
+                            for (let j = 0; j < dataevnt; j++) {
+                                if (evnt[j].user_status == "present") {
+                                    xp += 6;
+                                    limitHack += 1;
+                                } else if (evnt[j].user_status == "absent") {
+                                    xp -= 6;
+                                    limitHack += 1;
                                 }
-                            });
+                            }
+                        } else if (activity[i].type_title == "Project") {
+                            acti = activity[i].codeacti;
+                            const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
+                            if (response.data.user_project_status == "project_confirmed") {
+                                projethub += parseInt(response.data.title.toLowerCase().replace("#hubproject - ").replace("xp"));
+                                xp += projethub
+                            }
                         }
                     }
                     let Talk;
                     let Workshop;
                     let Experience;
                     let Hack;
+                    let Project;
                     if (limitTalk == 15) {
                         Talk = "You go 15 xp It's your limit";
                     }  else {
@@ -228,11 +237,12 @@ bot.on("message", message => {
                         Experience = `You got ${limitExp * 3} xp. You can do ${8 - limitExp} Experience to be at your limit`
                     }
                     Hack = `You got ${limitHack * 6} xp, You don't have limit on Hackatlon have fun`
+                    Project = `You got ${projethub} xp, You don't have limit on Projet have fun`
                     let embed = new Discord.MessageEmbed();
                     embed.setColor(color.Green);
                     embed.setTitle(`Your Xp`);
-                    embed.setDescription(`You got ${xp} xp\n**Détails**\n**Talk**: ${Talk}\n**Workshop**: ${Workshop}\n**Experience**: ${Experience}\n**Hackatlon**${Hack}`);
-                    return message.channel.send(embed);
+                    embed.setDescription(`You got ${xp} xp\n**Détails**\n**Talk**: ${Talk}\n**Workshop**: ${Workshop}\n**Experience**: ${Experience}\n**Hackatlon**${Hack}\n**Projet Hub**: ${Project}`);
+                    return msg.edit(embed);
                 });
             });
         } else {
