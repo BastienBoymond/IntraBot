@@ -205,6 +205,12 @@ bot.on("message", async message => {
                 embed.setDescription(`**Login**: ${login}\n**City**: ${location}\n**Promotion**: ${promo}\n**GPA**: ${gpa}\n**Crédits**: ${credits}\n**XP**: ${xp} You can do !xp for details`);
                 return msg.edit(embed);
             });
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
         }
     }
 
@@ -538,7 +544,44 @@ bot.on("message", async message => {
 
     //deadline
     else if (command === 'deadline') {
-
+        const index = getUserIndex(data, message.author.id);
+        if (args[0]) {
+            if (index > -1) {
+                const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/?format=json`);
+                let project = response.data.board.projets;
+                let dataproject = project.length;
+                for (let i = 0; i < dataproject; i++) {
+                    if (project[i].title == args[0]) {
+                        let d = new Date();
+                        let Currently = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}, ${d.getHours()}:${d.getMinutes()}`;
+                        let start = project[i].timeline_start;
+                        let end = project[i].timeline_end;
+                        let embed = new Discord.MessageEmbed();
+                        embed.setColor(color.Green);
+                        embed.setTitle(`The deadline of ${project[i].title}`);
+                        embed.setDescription(`**Start**: ${start}\n**Currently**: ${Currently}\n**End**: ${end}`);
+                        return message.channel.send(embed);
+                    }
+                }
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Red);
+                embed.setTitle(`Error`);
+                embed.setDescription(`Put a valid Project`);
+                return message.channel.send(embed);
+            } else {
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Red);
+                embed.setTitle(`Error`);
+                embed.setDescription(`Your not log so you cannot do this command do !login`);
+                return message.channel.send(embed);
+            }
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`**You need to put a project**\n Exemple !deadline [project]`);
+            return message.channel.send(embed);
+        }
     }
 
     //projet
