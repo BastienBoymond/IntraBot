@@ -112,8 +112,100 @@ bot.on("message", async message => {
     }
 
     //Profil
-    else if (command === "profil") {
-
+    else if (command === "profil" || command === "profile") {
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            let embed2 = new Discord.MessageEmbed();
+            embed2.setColor(color.Yellow);
+            embed2.setTitle(`Wait`);
+            embed2.setDescription(`Calculating...`);
+            let msg = await message.channel.send(embed2)
+            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then(async response => {
+                let all = response.data.location.split("/");
+                let city = all.pop();
+                let url = `https://intra.epitech.eu/`;
+                let year = response.data.scolaryear;
+                let name = response.data.title;
+                let gpa = response.data.gpa[0].gpa;
+                let login = response.data.login;
+                let credits = response.data.credits;
+                let promo = response.data.promo;
+                let location = response.data.location;
+                let image = response.data.picture;
+                let xp = 0;
+                const responce = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`)
+                let activity = responce.data.activites;
+                let projethub = 0;
+                let limitWorkshop = 0;
+                let limitTalk = 0;
+                let limitExp = 0;
+                let limitHack = 0;
+                let dataactivity = activity.length;
+                for (let i = 0; i < dataactivity ; i++) {
+                    if (activity[i].type_title == "Workshop") {
+                        evnt = activity[i].events;
+                        let dataevnt = evnt.length;
+                        for (let j = 0; j < dataevnt && limitWorkshop != 10; j++) {
+                            if (evnt[j].user_status == "present") {
+                                limitWorkshop += 1;
+                                xp += 2;
+                            } else if (evnt[j].user_status == "absent") {
+                                limitWorkshop -= 1;
+                                xp -= 2;
+                            }
+                        }
+                    } else if (activity[i].type_title == "Talk") {
+                        evnt = activity[i].events;
+                        let dataevnt = evnt.length;
+                        for (let j = 0; j < dataevnt && limitTalk != 15; j++) {
+                            if (evnt[j].user_status == "present") {
+                                limitTalk += 1;
+                                xp += 1;
+                            } else if (evnt[j].user_status == "absent") {
+                                limitTalk -= 1;
+                                xp -= 1;
+                            }
+                        }
+                    } else if (activity[i].type_title == "Experience") {
+                        if (limitExp < 8) {
+                            acti = activity[i].codeacti;
+                            const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/project/?format=json`);
+                            if (response.data.user_project_status == "project_confirmed") {
+                                limitExp += 1;
+                                xp += 3;
+                            }
+                        }
+                    } else if (activity[i].type_title == "Hackathon") {
+                        acti = activity[i].codeacti;
+                        const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
+                        evnt = response.data.events;
+                        let dataevnt = evnt.length;
+                        for (let j = 0; j < dataevnt; j++) {
+                            if (evnt[j].user_status == "present") {
+                                xp += 6;
+                                limitHack += 1;
+                            } else if (evnt[j].user_status == "absent") {
+                                xp -= 6;
+                                limitHack += 1;
+                            }
+                        }
+                    } else if (activity[i].type_title == "Project") {
+                        acti = activity[i].codeacti;
+                        const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
+                        if (response.data.user_project_status == "project_confirmed") {
+                            projethub += parseInt(response.data.title.toLowerCase().replace("#hubproject - ").replace("xp"));
+                            xp += projethub
+                        }
+                    }
+                }
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Green);
+                embed.setTitle(`${name}`);
+                embed.setURL(`${url}`)
+                embed.setDescription(`**Login**: ${login}\n**City**: ${location}\n**Promotion**: ${promo}\n**GPA**: ${gpa}\n**Crédits**: ${credits}\n**XP**: ${xp} You can do !xp for details`);
+                return msg.edit(embed);
+            });
+        }
     }
 
     //Gpa
@@ -294,10 +386,10 @@ bot.on("message", async message => {
                 let embed = new Discord.MessageEmbed();
                 embed.setColor(color.Green);
                 embed.setTitle(`Flags`);
-                embed.addField(flags.ghost.label + " " + emote.absent, flags.ghost.nb, false);
-                embed.addField(flags.difficulty.label + " " + emote.dificulty, flags.difficulty.nb, false);
-                embed.addField(flags.remarkable.label + " " + emote.pouce, flags.remarkable.nb, false);
-                embed.addField(flags.medal.label + " " + emote.medal, flags.medal.nb, false);
+                embed.addField(flags.ghost.label + " " + emote.absent, flags.ghost.nb, true);
+                embed.addField(flags.difficulty.label + " " + emote.dificulty, flags.difficulty.nb, true);
+                embed.addField(flags.remarkable.label + " " + emote.pouce, flags.remarkable.nb, true);
+                embed.addField(flags.medal.label + " " + emote.medal, flags.medal.nb, true);
                 return message.channel.send(embed);
             });
         } else {
