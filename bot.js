@@ -115,11 +115,6 @@ bot.on("message", async message => {
     else if (command === "profil" || command === "profile") {
         const index = getUserIndex(data, message.author.id);
         if (index > -1) {
-            let embed2 = new Discord.MessageEmbed();
-            embed2.setColor(color.Yellow);
-            embed2.setTitle(`Wait`);
-            embed2.setDescription(`Calculating...`);
-            let msg = await message.channel.send(embed2)
             axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then(async response => {
                 let all = response.data.location.split("/");
                 let city = all.pop();
@@ -131,8 +126,15 @@ bot.on("message", async message => {
                 let credits = response.data.credits;
                 let promo = response.data.promo;
                 let location = response.data.location;
-                let image = response.data.picture;
+                const attachment = new Discord.MessageAttachment(`https://intra.epitech.eu/auth-${data.log[index].auth}/file/userprofil/profilview/${data.log[index].mail}.jpg`, "profile-pic.jpg")
                 let xp = 0;
+                let embed2 = new Discord.MessageEmbed();
+                embed2.setColor(color.Yellow);
+                embed2.setTitle(`Wait`);
+                embed2.attachFiles(attachment);
+                embed2.setThumbnail('attachment://profile-pic.jpg');
+                embed2.setDescription(`Calculating...`);
+                let msg = await message.channel.send(embed2)
                 const responce = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`)
                 let activity = responce.data.activites;
                 let projethub = 0;
@@ -201,7 +203,9 @@ bot.on("message", async message => {
                 let embed = new Discord.MessageEmbed();
                 embed.setColor(color.Green);
                 embed.setTitle(`${name}`);
-                embed.setURL(`${url}`)
+                embed.attachFiles(attachment);
+                embed.setThumbnail('attachment://profile-pic.jpg');
+                embed.setURL(`${url}`);
                 embed.setDescription(`**Login**: ${login}\n**City**: ${location}\n**Promotion**: ${promo}\n**GPA**: ${gpa}\n**Crédits**: ${credits}\n**XP**: ${xp} You can do !xp for details`);
                 return msg.edit(embed);
             });
@@ -551,7 +555,7 @@ bot.on("message", async message => {
                 let project = response.data.board.projets;
                 let dataproject = project.length;
                 for (let i = 0; i < dataproject; i++) {
-                    if (project[i].title == args[0]) {
+                    if (project[i].title.toLowerCase() == args[0].toLowerCase()) {
                         let d = new Date();
                         let Currently = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}, ${d.getHours()}:${d.getMinutes()}`;
                         let start = project[i].timeline_start;
