@@ -44,7 +44,25 @@ bot.on("message", async message => {
 
     //Help
     if (command === "help") {
-
+        let embed = new Discord.MessageEmbed();
+        embed.setColor(color.Blue);
+        embed.setTitle(`Helping`);
+        embed.addField(`**Login**`,`Log user to Intrabot`, true);
+        embed.addField(`**Logout**`,`Logout user to Intrabot`, true);
+        embed.addField(`**Profil/Profile**`, `Send your detailled profil`, true);
+        embed.addField(`**gpa**`,`Send your GPA`, true);
+        embed.addField(`**Xp**`, `Send your Xp with some detail`, true);
+        embed.addField(`**Crédit**`,`Send your Crédits`, true);
+        embed.addField(`**Flags**`,`Send your Flags`, true);
+        embed.addField(`**Binomes**`,`Send your Binomes`, true);
+        embed.addField(`**News**`,`Send your last Notification`, true);
+        embed.addField(`**deadline**`,`Send the Currently Date and the end of projet`, true);
+        embed.addField(`**Projet**`,`Work In Progress`, true);
+        embed.addField(`**Activity**`,`Work In Progress`, true);
+        embed.addField(`**Docs**`,`Work In Progress`, true);
+        embed.addField(`**Emploi**`,`Work In Progress`, true);
+        embed.addField(`**Learn**`,`Work In Progress`, true);
+        return message.channel.send(embed);
     }
 
     //Login
@@ -599,9 +617,61 @@ bot.on("message", async message => {
     }
 
     //docs
-    else if (command === 'docs') {
-
-    }
+    else if (command === 'docs' || command == 'man') {
+        if (args[0]) {
+            const index = getUserIndex(data, message.author.id);
+                if (index > -1) {
+                    const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/file/Public/technical-documentations/?format=json`);
+                    let DATA = response.data;
+                    let datalenght = DATA.length;
+                    let embed2 = new Discord.MessageEmbed();
+                    embed2.setColor(color.Blue);
+                    embed2.setTitle(`**Click here**`);
+                    message.author.createDM().then(channel => {
+                        for (let i = 0; i < datalenght; i++) {
+                            if (`${DATA[i].title}` == args[0]) {
+                                embed2.setDescription(`https://intra.epitech.eu${DATA[i].fullpath}`);
+                            }
+                        }
+                        if (embed2.description == null || embed2.description == undefined)
+                            embed2.setDescription(`Unvalid path`);
+                            embed2.setColor(color.Red);
+                        channel.send(embed2)
+                    });
+                    let embed = new Discord.MessageEmbed();
+                    embed.setColor(color.Green  );
+                    embed.setTitle(`Done`);
+                    embed.setDescription(`**Files Send in DM**`);
+                    return message.channel.send(embed);
+                }else {
+                    let embed = new Discord.MessageEmbed();
+                    embed.setColor(color.Red);
+                    embed.setTitle(`Error`);
+                    embed.setDescription(`Your not log so you cannot do this command do !login`);
+                    return message.channel.send(embed);
+                }
+        } else {
+            const index = getUserIndex(data, message.author.id);
+                if (index > -1) {
+                    let embed = new Discord.MessageEmbed();
+                    embed.setColor(color.Blue);
+                    embed.setTitle(`Put a files name`);
+                    const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/file/Public/technical-documentations/?format=json`);
+                    let DATA = response.data;
+                    let datalenght = DATA.length;
+                    for (let i = 0; i < datalenght; i++) {
+                        embed.addField(`${DATA[i].title}`,`${i}`, true);
+                    }
+                    return message.channel.send(embed);
+                }else {
+                    let embed = new Discord.MessageEmbed();
+                    embed.setColor(color.Red);
+                    embed.setTitle(`Error`);
+                    embed.setDescription(`Your not log so you cannot do this command do !login`);
+                    return message.channel.send(embed);
+                }
+            }
+        }
 
     //emploi
     else if (command === 'emploi') {
