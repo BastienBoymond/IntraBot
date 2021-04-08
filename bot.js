@@ -59,9 +59,7 @@ bot.on("message", async message => {
         embed.addField(`**deadline**`,`Send the Currently Date and the end of projet`, true);
         embed.addField(`**Projet**`,`Work In Progress`, true);
         embed.addField(`**Activity**`,`Work In Progress`, true);
-        embed.addField(`**Docs**`,`Work In Progress`, true);
-        embed.addField(`**Emploi**`,`Work In Progress`, true);
-        embed.addField(`**Learn**`,`Work In Progress`, true);
+        embed.addField(`**Docs**`,`Send you all Technical Document`, true);
         return message.channel.send(embed);
     }
 
@@ -266,105 +264,181 @@ bot.on("message", async message => {
             embed2.setTitle(`Wait`);
             embed2.setDescription(`Calculating...`);
             let msg = await message.channel.send(embed2)
-            axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
-                let all = response.data.location.split("/");
-                let city = all.pop();
-                let year = response.data.scolaryear;
-                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`).then(async response => {
-                    let activity = response.data.activites;
-                    let xp = 0;
-                    let projethub = 0;
-                    let limitWorkshop = 0;
-                    let limitTalk = 0;
-                    let limitExp = 0;
-                    let limitHack = 0;
-                    let dataactivity = activity.length;
-                    for (let i = 0; i < dataactivity ; i++) {
-                        if (activity[i].type_title == "Workshop") {
-                            evnt = activity[i].events;
-                            let dataevnt = evnt.length;
-                            for (let j = 0; j < dataevnt && limitWorkshop != 10; j++) {
-                                if (evnt[j].user_status == "present") {
-                                    limitWorkshop += 1;
-                                    xp += 2;
-                                } else if (evnt[j].user_status == "absent") {
-                                    limitWorkshop -= 1;
-                                    xp -= 2;
+            if (args[0] === "hub") {
+                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
+                    let all = response.data.location.split("/");
+                    let city = all.pop();
+                    let year = response.data.scolaryear;
+                    axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`).then(async response => {
+                        let activity = response.data.activites;
+                        let xp = 0;
+                        let projethub = 0;
+                        let limitWorkshop = 0;
+                        let limitTalk = 0;
+                        let limitExp = 0;
+                        let limitHack = 0;
+                        let dataactivity = activity.length;
+                        for (let i = 0; i < dataactivity ; i++) {
+                            if (activity[i].type_title == "Workshop") {
+                                evnt = activity[i].events;
+                                let dataevnt = evnt.length;
+                                for (let j = 0; j < dataevnt && limitWorkshop != 10; j++) {
+                                    if (evnt[j].user_status == "present") {
+                                        limitWorkshop += 1;
+                                        xp += 2;
+                                    } else if (evnt[j].user_status == "absent") {
+                                        limitWorkshop -= 1;
+                                        xp -= 2;
+                                    }
                                 }
-                            }
-                        } else if (activity[i].type_title == "Talk") {
-                            evnt = activity[i].events;
-                            let dataevnt = evnt.length;
-                            for (let j = 0; j < dataevnt && limitTalk != 15; j++) {
-                                if (evnt[j].user_status == "present") {
-                                    limitTalk += 1;
-                                    xp += 1;
-                                } else if (evnt[j].user_status == "absent") {
-                                    limitTalk -= 1;
-                                    xp -= 1;
+                            } else if (activity[i].type_title == "Talk") {
+                                evnt = activity[i].events;
+                                let dataevnt = evnt.length;
+                                for (let j = 0; j < dataevnt && limitTalk != 15; j++) {
+                                    if (evnt[j].user_status == "present") {
+                                        limitTalk += 1;
+                                        xp += 1;
+                                    } else if (evnt[j].user_status == "absent") {
+                                        limitTalk -= 1;
+                                        xp -= 1;
+                                    }
                                 }
-                            }
-                        } else if (activity[i].type_title == "Experience") {
-                            if (limitExp < 8) {
+                            } else if (activity[i].type_title == "Experience") {
+                                if (limitExp < 8) {
+                                    acti = activity[i].codeacti;
+                                    const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/project/?format=json`);
+                                    if (response.data.user_project_status == "project_confirmed") {
+                                        limitExp += 1;
+                                        xp += 3;
+                                    }
+                                }
+                            } else if (activity[i].type_title == "Hackathon") {
                                 acti = activity[i].codeacti;
-                                const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/project/?format=json`);
+                                const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
+                                evnt = response.data.events;
+                                let dataevnt = evnt.length;
+                                for (let j = 0; j < dataevnt; j++) {
+                                    if (evnt[j].user_status == "present") {
+                                        xp += 6;
+                                        limitHack += 1;
+                                    } else if (evnt[j].user_status == "absent") {
+                                        xp -= 6;
+                                        limitHack += 1;
+                                    }
+                                }
+                            } else if (activity[i].type_title == "Project") {
+                                acti = activity[i].codeacti;
+                                const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
                                 if (response.data.user_project_status == "project_confirmed") {
-                                    limitExp += 1;
-                                    xp += 3;
+                                    projethub += parseInt(response.data.title.toLowerCase().replace("#hubproject - ").replace("xp"));
+                                    xp += projethub
                                 }
-                            }
-                        } else if (activity[i].type_title == "Hackathon") {
-                            acti = activity[i].codeacti;
-                            const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
-                            evnt = response.data.events;
-                            let dataevnt = evnt.length;
-                            for (let j = 0; j < dataevnt; j++) {
-                                if (evnt[j].user_status == "present") {
-                                    xp += 6;
-                                    limitHack += 1;
-                                } else if (evnt[j].user_status == "absent") {
-                                    xp -= 6;
-                                    limitHack += 1;
-                                }
-                            }
-                        } else if (activity[i].type_title == "Project") {
-                            acti = activity[i].codeacti;
-                            const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
-                            if (response.data.user_project_status == "project_confirmed") {
-                                projethub += parseInt(response.data.title.toLowerCase().replace("#hubproject - ").replace("xp"));
-                                xp += projethub
                             }
                         }
-                    }
-                    let Talk;
-                    let Workshop;
-                    let Experience;
-                    let Hack;
-                    let Project;
-                    if (limitTalk == 15) {
-                        Talk = "You go 15 xp It's your limit";
-                    }  else {
-                        Talk = `You got ${limitTalk} xp. You can do ${15 -limitTalk} Talk to be at your limit`
-                    }
-                    if (limitWorkshop == 10) {
-                        Workshop = "You go 20 xp It's your limit";
-                    }  else {
-                        Workshop = `You got ${limitWorkshop * 2} xp. You can do ${10 - limitWorkshop} Workshop to be at your limit`
-                    }
-                    if (limitExp == 10) {
-                        Experience = "You go 20 xp It's your limit";
-                    }  else {
-                        Experience = `You got ${limitExp * 3} xp. You can do ${8 - limitExp} Experience to be at your limit`
-                    }
-                    Hack = `You got ${limitHack * 6} xp, You don't have limit on Hackatlon have fun`
-                    Project = `You got ${projethub} xp, You don't have limit on Projet have fun`
-                    let embed = new Discord.MessageEmbed();
-                    embed.setColor(color.Green);
-                    embed.setTitle(`Your Xp`);
-                    embed.setDescription(`You got ${xp} xp\n**Détails**\n**Talk**: ${Talk}\n**Workshop**: ${Workshop}\n**Experience**: ${Experience}\n**Hackatlon**${Hack}\n**Projet Hub**: ${Project}`);
-                    return msg.edit(embed);
+                        let Talk;
+                        let Workshop;
+                        let Experience;
+                        let Hack;
+                        let Project;
+                        if (limitTalk == 15) {
+                            Talk = "You go 15 xp It's your limit";
+                        }  else {
+                            Talk = `You got ${limitTalk} xp. You can do ${15 -limitTalk} Talk to be at your limit`
+                        }
+                        if (limitWorkshop == 10) {
+                            Workshop = "You go 20 xp It's your limit";
+                        }  else {
+                            Workshop = `You got ${limitWorkshop * 2} xp. You can do ${10 - limitWorkshop} Workshop to be at your limit`
+                        }
+                        if (limitExp == 10) {
+                            Experience = "You go 20 xp It's your limit";
+                        }  else {
+                            Experience = `You got ${limitExp * 3} xp. You can do ${8 - limitExp} Experience to be at your limit`
+                        }
+                        Hack = `You got ${limitHack * 6} xp, You don't have limit on Hackatlon have fun`
+                        Project = `You got ${projethub} xp, You don't have limit on Projet have fun`
+                        let embed = new Discord.MessageEmbed();
+                        embed.setColor(color.Green);
+                        embed.setTitle(`Your Xp Hub`);
+                        embed.setDescription(`You got ${xp} xp\n**Détails**\n**Talk**: ${Talk}\n**Workshop**: ${Workshop}\n**Experience**: ${Experience}\n**Hackatlon**${Hack}\n**Projet Hub**: ${Project}`);
+                        return msg.edit(embed);
+                    });
                 });
-            });
+            } else if (args[0] === "ec") {
+                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
+                    let all = response.data.location.split("/");
+                    let city = all.pop();
+                    let year = response.data.scolaryear;
+                    axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/G-EPI-010/${city}-0-2/?format=json`).then( response => {
+                        let activity = response.data.activites;
+                        let xp = 0;
+                        let dataactivity = activity.length;
+                        for (let i = 0; i < dataactivity ; i++) {
+                            if (activity[i].type_title == "Workshop") {
+                                evnt = activity[i].events;
+                                let dataevnt = evnt.length;
+                                for (let j = 0; j < dataevnt; j++) {
+                                    if (evnt[j].user_status == "present") {
+                                        xp += 1;
+                                    } else if (evnt[j].user_status == "absent") {
+                                        xp -= 1;
+                                    }
+                                }
+                            }
+                        }
+                        let embed = new Discord.MessageEmbed();
+                        embed.setColor(color.Green);
+                        embed.setTitle("Your xp Extra Curicular");
+                        embed.setDescription(`You got ${xp} xp Extra Curicular`);
+                        return msg.edit(embed);
+                    });
+                });
+            } else if (args[0] === "div") {
+                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
+                    let all = response.data.location.split("/");
+                    let city = all.pop();
+                    let year = response.data.scolaryear;
+                    axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/G-DIV-001/${city}-0-1/?format=json`).then( response => {
+                        let activity = response.data.activites;
+                        let xp = 0;
+                        let dataactivity = activity.length;
+                        for (let i = 0; i < dataactivity ; i++) {
+                            if (activity[i].type_title == "Short Coding Club") {
+                                evnt = activity[i].events;
+                                let dataevnt = evnt.length;
+                                for (let j = 0; j < dataevnt; j++) {
+                                    if (evnt[j].user_status == "present") {
+                                        xp += 1;
+                                    } else if (evnt[j].user_status == "absent") {
+                                        xp -= 1;
+                                    }
+                                }
+                            } else if (activity[i].type_title == "Coding Club") {
+                                evnt = activity[i].events;
+                                let dataevnt = evnt.length;
+                                for (let j = 0; j < dataevnt; j++) {
+                                    if (evnt[j].user_status == "present") {
+                                        xp += 2;
+                                    } else if (evnt[j].user_status == "absent") {
+                                        xp -= 2;
+                                    }
+                                }
+                            }
+                        }
+                        let embed = new Discord.MessageEmbed();
+                        embed.setColor(color.Green);
+                        embed.setTitle(`Your Xp Diversity`);
+                        embed.setDescription(`You got ${xp} xp Diversity\n\n**This is only repertoried activities dont forget the Discovery one Discovery == 1xp**`);
+                        return msg.edit(embed);
+                    });
+                });
+            } else {
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Blue);
+                embed.setTitle(`Put valid Arguments`);
+                embed.setDescription("You need to put one of the following arguments [hub, ec, div]\n\nhub == Xp hub\nec == Extra curicular\ndiv == Diversity");
+                return msg.edit(embed);
+            }
         } else {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
@@ -671,16 +745,6 @@ bot.on("message", async message => {
                     return message.channel.send(embed);
                 }
             }
-        }
-
-    //emploi
-    else if (command === 'emploi') {
-
-    }
-
-    //learn
-    else if (command === 'learn') {
-
     }
     //if wrong command 
     else {
