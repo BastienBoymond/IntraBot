@@ -682,16 +682,52 @@ bot.on("message", async message => {
 
     //projet
     else if (command === 'projet') {
-
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/?format=json`);
+            let project = response.data.board.projets;
+            let dataproject = project.length;
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Green);
+            embed.setTitle(`**Project**`);
+            for (let k = 0; k < dataproject; k++) {
+                embed.addField(`${project[k].title}`,`${project[k].timeline_barre}%`,true);
+            }
+            return message.channel.send(embed);
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
+        }
     }
 
     //activite
     else if (command === 'activite') {
-
+        const index = getUserIndex(data, message.author.id);
+        if (index > -1) {
+            const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/?format=json`);
+            let project = response.data.board.activites;
+            let dataproject = project.length;
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Green);
+            embed.setTitle(`**Project**`);
+            for (let k = 0; k < dataproject; k++) {
+                embed.addField(`${project[k].title}`,`${project[k].timeline_barre}%`,true);
+            }
+            return message.channel.send(embed);
+        } else {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Red);
+            embed.setTitle(`Error`);
+            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            return message.channel.send(embed);
+        }
     }
 
     //docs
-    else if (command === 'docs' || command == 'man') {
+    else if (command === 'docs' || command == 'man' || command === 'doc') {
         if (args[0]) {
             const index = getUserIndex(data, message.author.id);
                 if (index > -1) {
