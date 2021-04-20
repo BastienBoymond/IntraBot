@@ -57,8 +57,8 @@ bot.on("message", async message => {
         embed.addField(`**Binomes**`,`Send your Binomes`, true);
         embed.addField(`**News**`,`Send your last Notification`, true);
         embed.addField(`**deadline**`,`Send the Currently Date and the end of projet`, true);
-        embed.addField(`**Projet**`,`Work In Progress`, true);
-        embed.addField(`**Activity**`,`Work In Progress`, true);
+        embed.addField(`**Projet**`,`Send you the list projet and timeline`, true);
+        embed.addField(`**Activity**`,`Send you the list activity and timeline`, true);
         embed.addField(`**Docs**`,`Send you all Technical Document`, true);
         return message.channel.send(embed);
     }
