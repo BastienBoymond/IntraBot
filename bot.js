@@ -691,7 +691,9 @@ bot.on("message", async message => {
             embed.setColor(color.Green);
             embed.setTitle(`**Project**`);
             for (let k = 0; k < dataproject; k++) {
-                embed.addField(`${project[k].title}`,`${project[k].timeline_barre}%`,true);
+                let actual = project[k].title.split("-");
+                if (actual[0] != "Back To The Future ")
+                    embed.addField(`${project[k].title}`,`${project[k].timeline_barre}%`,true);
             }
             return message.channel.send(embed);
         } else {
