@@ -21,7 +21,7 @@ Configurate the bot:
     touch config.json
     touch data.json
 
-Into data.json:
+Into config.json:
  
     {
       "token":"{Put your Discord Bot token}",
