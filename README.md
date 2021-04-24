@@ -10,28 +10,28 @@ I Put inside him a lot of command very Attractive That You need to try.
 ---
 Clone the Repository:
   
-  git clone https://github.com/BastienBoymond/IntraBot.git
+    git clone https://github.com/BastienBoymond/IntraBot.git
   
-Install Dependencies
+Install Dependencies:
   
-  npm install
+    npm install
   
-Configurate the bot
+Configurate the bot:
 
-  touch config.json
-  touch data.json
+    touch config.json
+    touch data.json
 
-Into data.json
+Into data.json:
  
-  {
-    "token":"{Put your Discord Bot token}",
-    "data":"./data.json",
-    "prefix":"!"
-  }
+    {
+      "token":"{Put your Discord Bot token}",
+      "data":"./data.json",
+      "prefix":"!"
+    }
 
-Lauch the Bot
+Lauch the Bot:
   
-  node index.js
+    node index.js
   
 ### How to use it 
 
