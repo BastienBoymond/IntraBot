@@ -34,5 +34,5 @@ Lauch the Bot:
     node index.js
   
 ### How to use it 
-
+----
 Now You just need to do !help into the serveur and your bot gonna work !
