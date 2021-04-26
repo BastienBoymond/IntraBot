@@ -6,6 +6,10 @@ The Objective of this Projet was To create a real Discord Bot who can comunicate
 
 I Put inside him a lot of command very Attractive That You need to try.
 
+If you want to add it on your Discord you can use this link :
+    
+    https://discord.com/api/oauth2/authorize?client_id=821504876675727411&permissions=8&scope=bot
+
 ### Installer
 ---
 Clone the Repository:
