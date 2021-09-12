@@ -2,6 +2,7 @@
 const Discord = require("discord.js");
 const fs = require("fs");
 const axios = require("axios");
+const IntraApi = require('epitech_intranet_api')
 const bot = new Discord.Client();
 
 //Json parsing
@@ -132,6 +133,7 @@ bot.on("message", async message => {
         const index = getUserIndex(data, message.author.id);
         if (index > -1) {
             axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then(async response => {
+                const intra = new IntraApi(`https://intra.epitech.eu/auth-${data.log[index].auth}`);
                 let all = response.data.location.split("/");
                 let city = all.pop();
                 let url = `https://intra.epitech.eu/`;
@@ -143,7 +145,7 @@ bot.on("message", async message => {
                 let promo = response.data.promo;
                 let location = response.data.location;
                 const attachment = new Discord.MessageAttachment(`https://intra.epitech.eu/auth-${data.log[index].auth}/file/userprofil/profilview/${data.log[index].mail}.jpg`, "profile-pic.jpg")
-                let xp = 0;
+                let xp = await intra.user.getXp(year)
                 let embed2 = new Discord.MessageEmbed();
                 embed2.setColor(color.Yellow);
                 embed2.setTitle(`Wait`);
@@ -151,71 +153,6 @@ bot.on("message", async message => {
                 embed2.setThumbnail('attachment://profile-pic.jpg');
                 embed2.setDescription(`Calculating...`);
                 let msg = await message.channel.send(embed2)
-                const responce = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`)
-                let activity = responce.data.activites;
-                let projethub = 0;
-                let limitWorkshop = 0;
-                let limitTalk = 0;
-                let limitExp = 0;
-                let limitHack = 0;
-                let dataactivity = activity.length;
-                for (let i = 0; i < dataactivity ; i++) {
-                    if (activity[i].type_title == "Workshop") {
-                        evnt = activity[i].events;
-                        let dataevnt = evnt.length;
-                        for (let j = 0; j < dataevnt && limitWorkshop != 10; j++) {
-                            if (evnt[j].user_status == "present") {
-                                limitWorkshop += 1;
-                                xp += 2;
-                            } else if (evnt[j].user_status == "absent") {
-                                limitWorkshop -= 1;
-                                xp -= 2;
-                            }
-                        }
-                    } else if (activity[i].type_title == "Talk") {
-                        evnt = activity[i].events;
-                        let dataevnt = evnt.length;
-                        for (let j = 0; j < dataevnt && limitTalk != 15; j++) {
-                            if (evnt[j].user_status == "present") {
-                                limitTalk += 1;
-                                xp += 1;
-                            } else if (evnt[j].user_status == "absent") {
-                                limitTalk -= 1;
-                                xp -= 1;
-                            }
-                        }
-                    } else if (activity[i].type_title == "Experience") {
-                        if (limitExp < 8) {
-                            acti = activity[i].codeacti;
-                            const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/project/?format=json`);
-                            if (response.data.user_project_status == "project_confirmed") {
-                                limitExp += 1;
-                                xp += 3;
-                            }
-                        }
-                    } else if (activity[i].type_title == "Hackathon") {
-                        acti = activity[i].codeacti;
-                        const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
-                        evnt = response.data.events;
-                        let dataevnt = evnt.length;
-                        for (let j = 0; j < dataevnt; j++) {
-                            if (evnt[j].user_status == "present") {
-                                xp += 6;
-                                limitHack += 1;
-                            } else if (evnt[j].user_status == "absent") {
-                                xp -= 6;
-                                limitHack += 1;
-                            }
-                        }
-                    } else if (activity[i].type_title == "Project") {
-                        acti = activity[i].codeacti;
-                        const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
-                        if (response.data.user_project_status == "project_confirmed") {
-                            projethub += parseInt(response.data.title.toLowerCase().replace("#hubproject - ").replace("xp"));
-                            xp += projethub
-                        }
-                    }
-                }
                 let embed = new Discord.MessageEmbed();
                 embed.setColor(color.Green);
                 embed.setTitle(`${name}`);
@@ -264,181 +201,14 @@ bot.on("message", async message => {
             embed2.setTitle(`Wait`);
             embed2.setDescription(`Calculating...`);
             let msg = await message.channel.send(embed2)
-            if (args[0] === "hub") {
-                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
-                    let all = response.data.location.split("/");
-                    let city = all.pop();
-                    let year = response.data.scolaryear;
-                    axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/?format=json`).then(async response => {
-                        let activity = response.data.activites;
-                        let xp = 0;
-                        let projethub = 0;
-                        let limitWorkshop = 0;
-                        let limitTalk = 0;
-                        let limitExp = 0;
-                        let limitHack = 0;
-                        let dataactivity = activity.length;
-                        for (let i = 0; i < dataactivity ; i++) {
-                            if (activity[i].type_title == "Workshop") {
-                                evnt = activity[i].events;
-                                let dataevnt = evnt.length;
-                                for (let j = 0; j < dataevnt && limitWorkshop != 10; j++) {
-                                    if (evnt[j].user_status == "present") {
-                                        limitWorkshop += 1;
-                                        xp += 2;
-                                    } else if (evnt[j].user_status == "absent") {
-                                        limitWorkshop -= 1;
-                                        xp -= 2;
-                                    }
-                                }
-                            } else if (activity[i].type_title == "Talk") {
-                                evnt = activity[i].events;
-                                let dataevnt = evnt.length;
-                                for (let j = 0; j < dataevnt && limitTalk != 15; j++) {
-                                    if (evnt[j].user_status == "present") {
-                                        limitTalk += 1;
-                                        xp += 1;
-                                    } else if (evnt[j].user_status == "absent") {
-                                        limitTalk -= 1;
-                                        xp -= 1;
-                                    }
-                                }
-                            } else if (activity[i].type_title == "Experience") {
-                                if (limitExp < 8) {
-                                    acti = activity[i].codeacti;
-                                    const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/project/?format=json`);
-                                    if (response.data.user_project_status == "project_confirmed") {
-                                        limitExp += 1;
-                                        xp += 3;
-                                    }
-                                }
-                            } else if (activity[i].type_title == "Hackathon") {
-                                acti = activity[i].codeacti;
-                                const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
-                                evnt = response.data.events;
-                                let dataevnt = evnt.length;
-                                for (let j = 0; j < dataevnt; j++) {
-                                    if (evnt[j].user_status == "present") {
-                                        xp += 6;
-                                        limitHack += 1;
-                                    } else if (evnt[j].user_status == "absent") {
-                                        xp -= 6;
-                                        limitHack += 1;
-                                    }
-                                }
-                            } else if (activity[i].type_title == "Project") {
-                                acti = activity[i].codeacti;
-                                const response = await axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/B-INN-000/${city}-0-1/${acti}/?format=json`);
-                                if (response.data.user_project_status == "project_confirmed") {
-                                    projethub += parseInt(response.data.title.toLowerCase().replace("#hubproject - ").replace("xp"));
-                                    xp += projethub
-                                }
-                            }
-                        }
-                        let Talk;
-                        let Workshop;
-                        let Experience;
-                        let Hack;
-                        let Project;
-                        if (limitTalk == 15) {
-                            Talk = "You go 15 xp It's your limit";
-                        }  else {
-                            Talk = `You got ${limitTalk} xp. You can do ${15 -limitTalk} Talk to be at your limit`
-                        }
-                        if (limitWorkshop == 10) {
-                            Workshop = "You go 20 xp It's your limit";
-                        }  else {
-                            Workshop = `You got ${limitWorkshop * 2} xp. You can do ${10 - limitWorkshop} Workshop to be at your limit`
-                        }
-                        if (limitExp == 10) {
-                            Experience = "You go 20 xp It's your limit";
-                        }  else {
-                            Experience = `You got ${limitExp * 3} xp. You can do ${8 - limitExp} Experience to be at your limit`
-                        }
-                        Hack = `You got ${limitHack * 6} xp, You don't have limit on Hackatlon have fun`
-                        Project = `You got ${projethub} xp, You don't have limit on Projet have fun`
-                        let embed = new Discord.MessageEmbed();
-                        embed.setColor(color.Green);
-                        embed.setTitle(`Your Xp Hub`);
-                        embed.setDescription(`You got ${xp} xp\n**Détails**\n**Talk**: ${Talk}\n**Workshop**: ${Workshop}\n**Experience**: ${Experience}\n**Hackatlon**${Hack}\n**Projet Hub**: ${Project}`);
-                        return msg.edit(embed);
-                    });
-                });
-            } else if (args[0] === "ec") {
-                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
-                    let all = response.data.location.split("/");
-                    let city = all.pop();
-                    let year = response.data.scolaryear;
-                    axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/G-EPI-010/${city}-0-2/?format=json`).then( response => {
-                        let activity = response.data.activites;
-                        let xp = 0;
-                        let dataactivity = activity.length;
-                        for (let i = 0; i < dataactivity ; i++) {
-                            if (activity[i].type_title == "Workshop") {
-                                evnt = activity[i].events;
-                                let dataevnt = evnt.length;
-                                for (let j = 0; j < dataevnt; j++) {
-                                    if (evnt[j].user_status == "present") {
-                                        xp += 1;
-                                    } else if (evnt[j].user_status == "absent") {
-                                        xp -= 1;
-                                    }
-                                }
-                            }
-                        }
-                        let embed = new Discord.MessageEmbed();
-                        embed.setColor(color.Green);
-                        embed.setTitle("Your xp Extra Curicular");
-                        embed.setDescription(`You got ${xp} xp Extra Curicular`);
-                        return msg.edit(embed);
-                    });
-                });
-            } else if (args[0] === "div") {
-                axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then( response => {
-                    let all = response.data.location.split("/");
-                    let city = all.pop();
-                    let year = response.data.scolaryear;
-                    axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/module/${year}/G-DIV-001/${city}-0-1/?format=json`).then( response => {
-                        let activity = response.data.activites;
-                        let xp = 0;
-                        let dataactivity = activity.length;
-                        for (let i = 0; i < dataactivity ; i++) {
-                            if (activity[i].type_title == "Short Coding Club") {
-                                evnt = activity[i].events;
-                                let dataevnt = evnt.length;
-                                for (let j = 0; j < dataevnt; j++) {
-                                    if (evnt[j].user_status == "present") {
-                                        xp += 1;
-                                    } else if (evnt[j].user_status == "absent") {
-                                        xp -= 1;
-                                    }
-                                }
-                            } else if (activity[i].type_title == "Coding Club") {
-                                evnt = activity[i].events;
-                                let dataevnt = evnt.length;
-                                for (let j = 0; j < dataevnt; j++) {
-                                    if (evnt[j].user_status == "present") {
-                                        xp += 2;
-                                    } else if (evnt[j].user_status == "absent") {
-                                        xp -= 2;
-                                    }
-                                }
-                            }
-                        }
-                        let embed = new Discord.MessageEmbed();
-                        embed.setColor(color.Green);
-                        embed.setTitle(`Your Xp Diversity`);
-                        embed.setDescription(`You got ${xp} xp Diversity\n\n**This is only repertoried activities dont forget the Discovery one Discovery == 1xp**`);
-                        return msg.edit(embed);
-                    });
-                });
-            } else {
-                let embed = new Discord.MessageEmbed();
-                embed.setColor(color.Blue);
-                embed.setTitle(`Put valid Arguments`);
-                embed.setDescription("You need to put one of the following arguments [hub, ec, div]\n\nhub == Xp hub\nec == Extra curicular\ndiv == Diversity");
-                return msg.edit(embed);
-            }
+            const intra = new IntraApi(`https://intra.epitech.eu/auth-${data.log[index].auth}`);
+            let year = await intra.user.getScolarYear();
+            let xp = await intra.user.getXp(year);
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(color.Green);
+            embed.setTitle(`XP`);
+            embed.setDescription(`Your XP was ${xp}`);
+            return msg.edit(embed);
         } else {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
