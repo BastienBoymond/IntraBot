@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/BastienBoymond/IntraBot#readme",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "change-url": "^1.1.2",
     "discord.js": "^12.5.1",
     "epitech_intranet_api": "^1.2.3",
