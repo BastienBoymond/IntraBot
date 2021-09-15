@@ -27,7 +27,7 @@
     "axios": "^0.21.1",
     "change-url": "^1.1.2",
     "discord.js": "^12.5.1",
-    "epitech_intranet_api": "^1.2.1",
+    "epitech_intranet_api": "^1.2.3",
     "fs": "0.0.1-security",
     "modify-image-url-md": "0.0.1",
     "node": "^15.10.0"

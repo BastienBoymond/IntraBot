@@ -134,8 +134,6 @@ bot.on("message", async message => {
         if (index > -1) {
             axios.get(`https://intra.epitech.eu/auth-${data.log[index].auth}/user/?format=json`).then(async response => {
                 const intra = new IntraApi(`https://intra.epitech.eu/auth-${data.log[index].auth}`);
-                let all = response.data.location.split("/");
-                let city = all.pop();
                 let url = `https://intra.epitech.eu/`;
                 let year = response.data.scolaryear;
                 let name = response.data.title;
@@ -196,19 +194,35 @@ bot.on("message", async message => {
     else if (command === "xp") {
         const index = getUserIndex(data, message.author.id);
         if (index > -1) {
-            let embed2 = new Discord.MessageEmbed();
-            embed2.setColor(color.Yellow);
-            embed2.setTitle(`Wait`);
-            embed2.setDescription(`Calculating...`);
-            let msg = await message.channel.send(embed2)
-            const intra = new IntraApi(`https://intra.epitech.eu/auth-${data.log[index].auth}`);
-            let year = await intra.user.getScolarYear();
-            let xp = await intra.user.getXp(year);
-            let embed = new Discord.MessageEmbed();
-            embed.setColor(color.Green);
-            embed.setTitle(`XP`);
-            embed.setDescription(`Your XP was ${xp}`);
-            return msg.edit(embed);
+            console.log(args[0]);
+            if (parseInt(args[0]) > 2000) {
+                let embed2 = new Discord.MessageEmbed();
+                embed2.setColor(color.Yellow);
+                embed2.setTitle(`Wait`);
+                embed2.setDescription(`Calculating...`);
+                let msg = await message.channel.send(embed2)
+                const intra = new IntraApi(`https://intra.epitech.eu/auth-${data.log[index].auth}`);
+                let xp = await intra.user.getXp(args[0], true);
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Green);
+                embed.setTitle(`You got ${xp.xp} Xp`);
+                embed.setDescription(`You do ${xp.details.hubProjects} xp in Hub Project\nYou do ${xp.details.limitExperience * 3} xp in Experience\nYou do ${xp.details.limitOrganizationHubTalk * 4} xp in Organisation Hubtalk\nYou do ${xp.details.limitOrganizationWorkshop * 7} xp in Organisation Workshop\nYou do ${xp.details.hackathonsOrganisation * 15} xp in Organisation Hackatlon\nYou do ${xp.details.limitParticipationHubTalk} xp in Participation Hubtalk\nYou do ${xp.details.limitParticipationWorshop * 2} xp in Participation Workshop\nYou do ${xp.details.hackathonsParicipation * 6} xp in Participation Hackatlon`);
+                return msg.edit(embed);
+            } else {
+                let embed2 = new Discord.MessageEmbed();
+                embed2.setColor(color.Yellow);
+                embed2.setTitle(`Wait`);
+                embed2.setDescription(`Calculating...`);
+                let msg = await message.channel.send(embed2)
+                const intra = new IntraApi(`https://intra.epitech.eu/auth-${data.log[index].auth}`);
+                let year = await intra.user.getScolarYear();
+                let xp = await intra.user.getXp(year, true);
+                let embed = new Discord.MessageEmbed();
+                embed.setColor(color.Green);
+                embed.setTitle(`You got ${xp.xp} Xp`);
+                embed.setDescription(`You do ${xp.details.hubProjects} xp in Hub Project\nYou do ${xp.details.limitExperience * 3} xp in Experience\nYou do ${xp.details.limitOrganizationHubTalk * 4} xp in Organisation Hubtalk\nYou do ${xp.details.limitOrganizationWorkshop * 7} xp in Organisation Workshop\nYou do ${xp.details.hackathonsOrganisation * 15} xp in Organisation Hackatlon\nYou do ${xp.details.limitParticipationHubTalk} xp in Participation Hubtalk\nYou do ${xp.details.limitParticipationWorshop * 2} xp in Participation Workshop\nYou do ${xp.details.hackathonsParicipation * 6} xp in Participation Hackatlon`);
+                return msg.edit(embed);
+            }
         } else {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
