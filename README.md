@@ -9,7 +9,7 @@
 The goal of this bot is to provide a simple way to interact with the [Intranet](https://intra.epitech.eu) website of Epitech.
 
 I Create a lot of command to interact with the Intranet.
-Whe got the folowing commands:
+We got the folowing commands:
 
 * **`!help`**: Display this help message.
 
