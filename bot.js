@@ -53,14 +53,14 @@ bot.on("message", async message => {
         embed.addField(`**Profil/Profile**`, `Send your detailled profil`, true);
         embed.addField(`**gpa**`,`Send your GPA`, true);
         embed.addField(`**Xp**`, `Send your Xp with some detail`, true);
-        embed.addField(`**Crédit**`,`Send your Crédits`, true);
+        embed.addField(`**Crédit**`,`Send your Credits`, true);
         embed.addField(`**Flags**`,`Send your Flags`, true);
         embed.addField(`**Binomes**`,`Send your Binomes`, true);
         embed.addField(`**News**`,`Send your last Notification`, true);
         embed.addField(`**deadline**`,`Send the Currently Date and the end of projet`, true);
         embed.addField(`**Projet**`,`Send you the list projet and timeline`, true);
         embed.addField(`**Activity**`,`Send you the list activity and timeline`, true);
-        embed.addField(`**Docs**`,`Send you all Technical Document`, true);
+        embed.addField(`**Docs**`,`Send you all Technical Documents`, true);
         return message.channel.send(embed);
     }
 
@@ -110,13 +110,13 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Green);
             embed.setTitle(`Disconnected`);
-            embed.setDescription(`You are Desconnected for the bot`);
+            embed.setDescription(`You are Disconnected for the bot`);
             return message.channel.send(embed);
         } else {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so I cannot Logout you`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }
 
@@ -164,7 +164,7 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }
     }
@@ -185,7 +185,7 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }
     }
@@ -227,7 +227,7 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }  
     }
@@ -282,7 +282,7 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }
     }
@@ -309,7 +309,7 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }
     }
@@ -345,7 +345,7 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }
     }
@@ -364,7 +364,7 @@ bot.on("message", async message => {
                         let nbalert = DATA.length;
                         if (nbalert == undefined)
                             nbalert = 0;
-                        embed.setDescription(`**You got ${nbalert} alert**`);
+                        embed.setDescription(`**You got ${nbalert} alert(s)**`);
                         if (nbalert >= 1)
                             embed.setColor(color.Yellow);
                         if (nbalert >= 3)
@@ -410,14 +410,14 @@ bot.on("message", async message => {
                 let embed = new Discord.MessageEmbed();
                 embed.setColor(color.Red);
                 embed.setTitle(`Error`);
-                embed.setDescription(`Your not log so you cannot do this command do !login`);
+                embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
                 return message.channel.send(embed);
             }
         } else {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`**The only arg you can put was**\n !news [alert, coming, missed, message]`);
+            embed.setDescription(`**The only arg you can enter is**\n !news [alert, coming, missed, message]`);
             return message.channel.send(embed);
         }
     }
@@ -452,7 +452,7 @@ bot.on("message", async message => {
                 let embed = new Discord.MessageEmbed();
                 embed.setColor(color.Red);
                 embed.setTitle(`Error`);
-                embed.setDescription(`Your not log so you cannot do this command do !login`);
+                embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
                 return message.channel.send(embed);
             }
         } else {
@@ -484,7 +484,7 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }
     }
@@ -507,7 +507,7 @@ bot.on("message", async message => {
             let embed = new Discord.MessageEmbed();
             embed.setColor(color.Red);
             embed.setTitle(`Error`);
-            embed.setDescription(`Your not log so you cannot do this command do !login`);
+            embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
             return message.channel.send(embed);
         }
     }
@@ -537,13 +537,13 @@ bot.on("message", async message => {
                     let embed = new Discord.MessageEmbed();
                     embed.setColor(color.Green  );
                     embed.setTitle(`Done`);
-                    embed.setDescription(`**Files Send in DM**`);
+                    embed.setDescription(`**Files Sent in DM**`);
                     return message.channel.send(embed);
                 }else {
                     let embed = new Discord.MessageEmbed();
                     embed.setColor(color.Red);
                     embed.setTitle(`Error`);
-                    embed.setDescription(`Your not log so you cannot do this command do !login`);
+                    embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
                     return message.channel.send(embed);
                 }
         } else {
@@ -563,7 +563,7 @@ bot.on("message", async message => {
                     let embed = new Discord.MessageEmbed();
                     embed.setColor(color.Red);
                     embed.setTitle(`Error`);
-                    embed.setDescription(`Your not log so you cannot do this command do !login`);
+                    embed.setDescription(`You're not logged in so you cannot do this command, do !login`);
                     return message.channel.send(embed);
                 }
             }
